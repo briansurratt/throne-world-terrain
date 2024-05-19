@@ -31,6 +31,92 @@ include<constants.scad>
 // translate([unitHeight,0,0]) 
 
 
+flatWallSection(5);
+
+// units = number of inches 
+module flatWallSection(units=2) {
+
+translate([0,units * inchRatio,0])
+    rotate([90,0,0])
+    linear_extrude(units * inchRatio) {
+        fillet(3) 
+        polygon([
+            [0,0],
+            [0,facadeThickness],
+            [unitHeight - stepHeight,facadeThickness],
+            [unitHeight - stepHeight,capEdgeDepth],
+            [unitHeight, capEdgeDepth],
+            [unitHeight,0]
+        ]);
+
+    }
+
+    layFlatFooter(units);
+
+    startingOffset = inchRatio * 0.25;
+    incrementalOffset = inchRatio * 0.5;
+    numberOfBits = units * 2;
+    
+    for(i = [1 : 1 : numberOfBits]) {
+        offset = startingOffset + (i - 1) * incrementalOffset;
+        translate([unitHeight,offset,0])
+        capAlignmentMale();
+    }
+    
+}
+
+
+
+
+module capAlignmentMale() {
+    cylinder(r = 1, h=stepTred);
+}
+
+module capAlignmentFemale() {
+    cylinder(r = 1.1, h=stepTred);
+}
+
+
+module layFlatFooter(units = 2) {
+    translate([0,0,stepTred]) {
+        rotate([0,90,0]) {
+            footerRun(units);
+        }
+    }
+}
+
+
+
+module fillet(r) {
+   offset(r = -r) {
+     offset(delta = r) {
+       children();
+     }
+   }
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 module testBase() {
 //    translate([capWidth,capWidth,0]) 
     difference() {
@@ -48,7 +134,10 @@ module testBase() {
 // footerInsideRadius(2);
 
 
-//capRun(2);
+
+
+
+// capRun(2);
 // capInnerRadius();
 //  capInnerRadius(1,true,true);
 // capInnerRadius(1,true,false);
@@ -132,10 +221,10 @@ module footerCorner(l = unitHeight, w = unitHeight) {
 
 // cap factory
 
-for (a =[1:5]) {
-    translate([10 * a, 0,0]) 
-   capRun(a);
-}
+// for (a =[1:5]) {
+//     translate([10 * a, 0,0]) 
+//    capRun(a);
+// }
 
 module capRun(units = 1) {
     translate([0,unitHeight,0])

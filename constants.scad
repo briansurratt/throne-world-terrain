@@ -17,3 +17,8 @@ taperHeight = .75;
 taperWidth = stepTred;
 
 default_wall = 2;
+
+
+// how thick to make the continuous flat surface of the wall
+facadeThickness = 0.5;
+capEdgeDepth = stepTred * 1.5;
