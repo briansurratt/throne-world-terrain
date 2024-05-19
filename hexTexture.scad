@@ -6,15 +6,18 @@ wallThickness = 3;
 baseThickness = 2;
 wallHieght = baseThickness + 3;
 
-honeycombWall = 3 * nozzelThickness;
+honeycombWall = nozzelThickness;
 
-linear_extrude(baseThickness + 1)  {
-    honeycomb(subUnitSide, subUnitSide,5, honeycombWall);
+module unit() {
+    linear_extrude(baseThickness + 2)  {
+        honeycomb(subUnitSide, subUnitSide,5.5, honeycombWall);
+    }
+
+    baseside = subUnitSide;
+    cube([baseside,baseside,baseThickness]);
 }
 
-baseside = subUnitSide+ wallThickness;
-cube([baseside,baseside,baseThickness]);
-
-translate([0,subUnitSide,0]) cube([baseside, wallThickness, wallHieght]); 
-translate([subUnitSide,0,0]) cube([wallThickness,baseside,  wallHieght]); 
-
+// unit();
+// mirror([0,1,0]) unit();
+// mirror([1,0,0]) unit();
+mirror([0,1,0]) mirror([1,0,0]) unit();
