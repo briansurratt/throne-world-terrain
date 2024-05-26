@@ -30,42 +30,78 @@ include<constants.scad>
 
 // translate([unitHeight,0,0]) 
 
+//  flatWall(3);
 
-flatWallSection(5);
+module flatWall(units = 2) {
+    flatWallSection(units);
+}
+
+module flatWallBisection(units=2) {
+    translate([unitHeight/2,units * inchRatio,facadeThickness])
+    rotate([90,0,0]) {
+    linear_extrude(units*inchRatio) {
+        polygon([[0,0],[facadeThickness,0],[facadeThickness/2,-facadeThickness/4]]);
+    }
+    }
+}
+
+// front pitch = stepHeight by 1
+
+flatCap(3);
+
+module flatCap(units=2) {
+    
+    difference() {
+    translate([0,units * inchRatio,0]){
+        rotate([90,0,0]){
+            linear_extrude(units * inchRatio) {
+                polygon([
+                [0,-3],
+                [0,capEdgeDepth + 1],
+                [stepHeight * 2, ,capEdgeDepth + 3],
+                [stepHeight * 2, ,capEdgeDepth + 2],
+                [1.5 ,capEdgeDepth],
+                [1.5, 0],
+            ]);
+            }
+        }
+    }
+
+    capAlignmnetArray(units, xOffset=0, zOffset = -0.1) {
+        capAlignmentFemale();
+    }
+}
+}
+           
+
+
 
 // units = number of inches 
 module flatWallSection(units=2) {
 
-translate([0,units * inchRatio,0])
-    rotate([90,0,0])
-    linear_extrude(units * inchRatio) {
-        fillet(3) 
-        polygon([
-            [0,0],
-            [0,facadeThickness],
-            [unitHeight - stepHeight,facadeThickness],
-            [unitHeight - stepHeight,capEdgeDepth],
-            [unitHeight, capEdgeDepth],
-            [unitHeight,0]
-        ]);
+    translate([0,units * inchRatio,0])
+        rotate([90,0,0])
+            linear_extrude(units * inchRatio) {
+                fillet(3) 
+                polygon([
+                    [0,0],
+                    [0,facadeThickness],
+                    [unitHeight - stepHeight,facadeThickness],
+                    [unitHeight - stepHeight,capEdgeDepth],
+                    [unitHeight, capEdgeDepth + 1],
+                    [unitHeight,0]
+                ]);
 
-    }
+            }
 
     layFlatFooter(units);
 
-    startingOffset = inchRatio * 0.25;
-    incrementalOffset = inchRatio * 0.5;
-    numberOfBits = units * 2;
-    
-    for(i = [1 : 1 : numberOfBits]) {
-        offset = startingOffset + (i - 1) * incrementalOffset;
-        translate([unitHeight,offset,0])
+    capAlignmnetArray(units) {
         capAlignmentMale();
     }
     
+
 }
-
-
 
 
 module capAlignmentMale() {
@@ -73,7 +109,7 @@ module capAlignmentMale() {
 }
 
 module capAlignmentFemale() {
-    cylinder(r = 1.1, h=stepTred);
+    cylinder(r = 1.1, h=stepTred + 0.2);
 }
 
 
@@ -95,6 +131,19 @@ module fillet(r) {
    }
 }
 
+module capAlignmnetArray(units = 2, xOffset=unitHeight, zOffset = 0) {
+
+    startingOffset = inchRatio * 0.25;
+    incrementalOffset = inchRatio * 0.5;
+    numberOfBits = units * 2;
+    
+    for(i = [1 : 1 : numberOfBits]) {
+        offset = startingOffset + (i - 1) * incrementalOffset;
+        translate([xOffset,offset,zOffset])
+        children();
+    }
+
+}
 
 
 

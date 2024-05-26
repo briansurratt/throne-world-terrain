@@ -20,5 +20,5 @@ default_wall = 2;
 
 
 // how thick to make the continuous flat surface of the wall
-facadeThickness = 0.5;
+facadeThickness = 1;
 capEdgeDepth = stepTred * 1.5;
