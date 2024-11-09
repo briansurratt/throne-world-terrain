@@ -38,14 +38,14 @@ module steps(units = 4) {
 module footerInterface() {
     interfaceLength = 2 * stepTred;
 
-difference() {
-    cube([stepTred,interfaceLength, 3 *stepHeight]) ;
-    translate([0,-0.5, stepHeight + stepTred]) {
-        rotate([-90,0,0])  {
-            cylinder(interfaceLength + 1, r = stepTred);
+    difference() {
+        cube([stepTred,interfaceLength, 3 *stepHeight]) ;
+        translate([0,-0.5, stepHeight + stepTred]) {
+            rotate([-90,0,0])  {
+                cylinder(interfaceLength + 1, r = stepTred);
+            }
         }
     }
-}
 }
 
 

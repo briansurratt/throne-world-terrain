@@ -30,7 +30,33 @@ include<constants.scad>
 
 // translate([unitHeight,0,0]) 
 
-//  flatWall(3);
+
+
+// flatWall(1);
+flatWallCorner();
+// flatCap(3);
+
+module flatWallCorner() {
+    difference() {
+
+    translate([0,-inchRatio,0]) flatWall(2);
+
+    translate([-2,0,0])
+    mirror([0,1,0])
+    rotate([90,0,90])
+    linear_extrude(inchRatio + 4)
+        polygon(
+            [
+                [0,0],
+                [10,10],
+                [50,10],
+                [50,0],
+            ]
+        );
+
+    }
+
+}
 
 module flatWall(units = 2) {
     flatWallSection(units);
@@ -47,7 +73,10 @@ module flatWallBisection(units=2) {
 
 // front pitch = stepHeight by 1
 
-flatCap(3);
+
+
+
+
 
 module flatCap(units=2) {
     
@@ -61,7 +90,7 @@ module flatCap(units=2) {
                 [stepHeight * 2, ,capEdgeDepth + 3],
                 [stepHeight * 2, ,capEdgeDepth + 2],
                 [1.5 ,capEdgeDepth],
-                [1.5, 0],
+                [1.5, -2.5],
             ]);
             }
         }
@@ -99,7 +128,6 @@ module flatWallSection(units=2) {
     capAlignmnetArray(units) {
         capAlignmentMale();
     }
-    
 
 }
 
@@ -109,7 +137,7 @@ module capAlignmentMale() {
 }
 
 module capAlignmentFemale() {
-    cylinder(r = 1.1, h=stepTred + 0.2);
+    cylinder(r = 1.2, h=stepTred + 0.2);
 }
 
 
@@ -181,7 +209,6 @@ module testBase() {
 // interfaceFooterCorner();
 // footerInsideRadius();
 // footerInsideRadius(2);
-
 
 
 
