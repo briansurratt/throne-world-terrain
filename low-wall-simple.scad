@@ -1,7 +1,11 @@
 include<constants.scad>
 
 // flatWallSection(3);
-finishedWall(3,startCorner=true,endCorner= true);
+// finishedWall(3,startCorner=true,endCorner= true);
+
+wallProfile(withLip = false);
+
+// corner(withLip = true);
 
 
 module finishedWall(units=2, startCorner=false, endCorner=false){
@@ -49,11 +53,18 @@ module flatWallSection(units =2) {
 
 }
 
-module corner() {
+module corner(withLip = false) {
+    
     intersection() {
         flatWallSection(1);
         translate([0,stepTred+1,-inchRatio+ stepTred + 1])
         rotate([90,0,0]) flatWallSection(1);
+    }
+
+
+    if (withLip){
+        translate([inchRatio,0,0]) 
+        cube([stepHeight, stepTred + 1, stepTred  + 1]) ;
     }
 }
 
@@ -66,19 +77,32 @@ module fillet(r) {
 }
 
 
-module wallProfile() {
-    fillet(3) {
-        polygon([
+module wallProfile(withLip = false) {
+
+    startVector = [
             [0,0],
             [0,stepTred + 1],
             [stepHeight,stepTred],
             [stepHeight,facadeThickness],
             [unitHeight - stepHeight,facadeThickness],
             [unitHeight - stepHeight,stepTred],
-            [unitHeight, stepTred + 1],
-            [unitHeight,0]
-        ]);
+            [unitHeight, stepTred + 1]
+    ];
+
+    lipVector = withLip ? [             
+        [unitHeight + stepHeight, stepTred + 1],
+        [unitHeight + stepHeight, stepTred],
+        [unitHeight + 1, stepTred]
+    ] : [];
+
+    endVector = [[unitHeight,0]];
+
+    polyVector = concat(startVector,lipVector,endVector);
+
+    fillet(3) {
+        polygon(polyVector);
     }
+
 }
 
 
