@@ -1,18 +1,28 @@
 include<constants.scad>
 
 // flatWallSection(3);
-// finishedWall(3,startCorner=true,endCorner= true);
+// finishedWall(5,startCorner=false,endCorner= false);
 
-wallProfile(withLip = false);
+// wallProfile(withLip = false);
 
 // corner(withLip = true);
 
+flatWallSection(3, withLip=true, withRibs=true);
 
-module finishedWall(units=2, startCorner=false, endCorner=false){
+
+
+module finishedWall(
+    units=2, 
+    startCorner=false, 
+    endCorner=false, 
+    withLip=false,
+    withRibs=false
+    ){
 
     echo(str("units = ", units));
     echo(str("startCorner = ", startCorner));
     echo(str("endCorner = ", endCorner));
+    echo(str("withLip = ", withLip));
 
     totalLength = units * inchRatio;
 
@@ -25,7 +35,7 @@ module finishedWall(units=2, startCorner=false, endCorner=false){
             corner();
         }
         
-        if (endCorner == true) {
+        if (endCorner == true )  {
             translate([0,totalLength + stepTred + facadeThickness,0])
             mirror([0,1,0]) corner();
         }
@@ -33,23 +43,29 @@ module finishedWall(units=2, startCorner=false, endCorner=false){
 }
 
 
-module flatWallSection(units =2) {
+module flatWallSection(units =2, withLip=false, withRibs=false) {
 
     totalLength = units * inchRatio;
 
     translate([0,units * inchRatio,0])
     rotate([90,0,0])
         linear_extrude(totalLength) {
-            wallProfile();
+            wallProfile(withLip);
         }
 
-    numberOfRibs = units;
 
-    for(i = [1 : numberOfRibs]) {
-        translate([0,inchRatio/2 + (i -1)  * inchRatio]){
-            wallRib();
+
+    if (withLip != true &&  withRibs) {
+        
+        numberOfRibs = units;
+
+        for(i = [1 : numberOfRibs]) {
+            translate([0,inchRatio/2 + (i -1)  * inchRatio]){
+                wallRib();
+            }
         }
-     }
+
+    }
 
 }
 
