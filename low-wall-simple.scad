@@ -1,18 +1,56 @@
 include<constants.scad>
 
+$fn = $preview ? 32 : 128;
+
+// big set peice walls, lhs only
+// all with lip, no rib
+
+// step face
+// finishedWall(run=49,startCorner=true,endCorner= true, withLip = true, withRibs=false);
+
+// front face
+//finishedWall(run=129,startCorner=false,endCorner= true, withLip = true, withRibs=false);
+
+
+// side face, printed in halves, no corners
+// total length = 228
+// finishedWall(run=114,startCorner=false,endCorner= false, withLip = true, withRibs=false);
+
+// rear wing face
+//finishedWall(run=154,startCorner=true,endCorner= false, withLip = true, withRibs=false);
+
+// rear center, printed in halves, no corners
+// total length =  254
+// finishedWall(run=254 / 2,startCorner=true,endCorner= false, withLip = true, withRibs=false);
+
+// front face arc
+// insideRoundCorner(radius=2*inchRatio, withLip = true);
+
+
+// rear face arc
+insideRoundCorner(radius=inchRatio, withLip = true);
+
+
+// experiment calls
 // flatWallSection(3);
-finishedWall(5,startCorner=false,endCorner= true, withLip = true, withRibs=true);
+// finishedWall(run=35,startCorner=true,endCorner= true, withLip = true, withRibs=true);
+// finishedWall(run = 50,startCorner=true,endCorner= true, withLip = true, withRibs=true);
 
 // wallProfile(withLip = false);
 
 // corner(withLip = true);
 
-// flatWallSection(3, withLip=true, withRibs=true);
+// insideRoundCorner(radius=2*inchRatio, withLip = true);
+// outsideRoundCorner(radius=1*inchRatio, withLip = true);
 
+// insideSemiCircle(radius=1*inchRatio, withLip = true);
+// outsideSemiCircle(radius=1*inchRatio, withLip = true);
 
+//flatWallSection(100, withLip=false, withRibs=true);
 
 module finishedWall(
     units=2, 
+    run=0,
     startCorner=false, 
     endCorner=false, 
     withLip=false,
@@ -20,16 +58,21 @@ module finishedWall(
     ){
 
     echo(str("units = ", units));
+    echo(str("run = ", run));
     echo(str("startCorner = ", startCorner));
     echo(str("endCorner = ", endCorner));
     echo(str("withLip = ", withLip));
     echo(str("withRibs = ", withRibs));
 
-    totalLength = units * inchRatio;
+    // if the run is not specified use the units
+    totalLength = (run == 0) ? (units * inchRatio) : run ;
+
+
+    echo(str("totalLength = ", totalLength));
 
     union() {
 
-         flatWallSection(units,withLip,withRibs);
+         flatWallSection(totalLength,withLip,withRibs);
 
         if (startCorner == true) {
             translate([0,-(stepTred+1),0])
@@ -44,11 +87,16 @@ module finishedWall(
 }
 
 
-module flatWallSection(units =2, withLip=false, withRibs=false) {
+module flatWallSection(totalLength =75, withLip=false, withRibs=false) {
 
-    totalLength = units * inchRatio;
+    echo("******************************")
+    echo("flatWallSection")
+    echo(str("totalLength = ", totalLength));
+    echo(str("withLip = ", withLip));
+    echo(str("withRibs = ", withRibs));
+    
 
-    translate([0,units * inchRatio,0])
+    translate([0,totalLength,0])
     rotate([90,0,0])
         linear_extrude(totalLength) {
             wallProfile(withLip);
@@ -56,24 +104,35 @@ module flatWallSection(units =2, withLip=false, withRibs=false) {
 
     if (withLip != true &&  withRibs) {
 
-        numberOfRibs = units;
+        // minimum 1/2 from start / divided by inch
+        
+        numberOfRibs = round((totalLength - inchRatio) / inchRatio);
+        // numberOfRibs = round(totalLength / inchRatio);
+
+        echo(str("numberOfRibs = ", numberOfRibs));
+
+        calculatedSpacing = (totalLength - inchRatio) / (numberOfRibs - 1) ;
+        echo(str("calculatedSpacing = ", calculatedSpacing));
+        
 
         for(i = [1 : numberOfRibs]) {
-            translate([0,inchRatio/2 + (i -1)  * inchRatio]){
+            translate([0,inchRatio/2 + (i -1)  * calculatedSpacing]){
                 wallRib();
             }
         }
 
     }
 
+    echo("******************************");
+
 }
 
 module corner(withLip = false) {
     
     intersection() {
-        flatWallSection(1);
+        flatWallSection(inchRatio);
         translate([0,stepTred+1,-inchRatio+ stepTred + 1])
-        rotate([90,0,0]) flatWallSection(1);
+        rotate([90,0,0]) flatWallSection(inchRatio);
     }
 
 
@@ -127,7 +186,6 @@ module wallRib() {
 
     elipseZ = outerZ - facadeThickness - ribThickness;
 
-
     translate([unitHeight/2,0,0.125 + outerZ/2]) 
     rotate([90,0,0])
     linear_extrude(height = ribWidth, center=true)
@@ -160,4 +218,32 @@ module wallRibCap()  {
 
 module elipse (w = 30, l = 10) {
     resize([w,l])circle(d=20);
+}
+
+module insideRoundCorner(radius = inchRatio, withLip = false) {
+    roundCorner(radius, withLip);
+}
+
+module insideSemiCircle(radius = inchRatio, withLip = false) {
+    roundCorner(radius, withLip,faceAngle=180);
+}
+
+module outsideRoundCorner(radius = inchRatio, withLip = false) {
+    roundCorner(radius * -1, withLip);
+}
+
+module outsideSemiCircle(radius = inchRatio, withLip = false) {
+    roundCorner(radius * -1, withLip,faceAngle=180);
+}
+
+
+module roundCorner(radius = inchRatio, withLip = false, faceAngle=90) {
+
+        rotate_extrude(angle=faceAngle) {
+        translate([radius,0,0])
+        rotate([0,0,90])
+        translate([-inchRatio/2, 0,0])   
+        wallProfile(withLip);
+    }
+
 }
