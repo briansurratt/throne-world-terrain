@@ -1,13 +1,13 @@
 include<constants.scad>
 
 // flatWallSection(3);
-// finishedWall(5,startCorner=false,endCorner= false);
+finishedWall(5,startCorner=false,endCorner= true, withLip = true, withRibs=true);
 
 // wallProfile(withLip = false);
 
 // corner(withLip = true);
 
-flatWallSection(3, withLip=true, withRibs=true);
+// flatWallSection(3, withLip=true, withRibs=true);
 
 
 
@@ -23,21 +23,22 @@ module finishedWall(
     echo(str("startCorner = ", startCorner));
     echo(str("endCorner = ", endCorner));
     echo(str("withLip = ", withLip));
+    echo(str("withRibs = ", withRibs));
 
     totalLength = units * inchRatio;
 
     union() {
 
-         flatWallSection(units);
+         flatWallSection(units,withLip,withRibs);
 
         if (startCorner == true) {
             translate([0,-(stepTred+1),0])
-            corner();
+            corner(withLip=withLip);
         }
         
         if (endCorner == true )  {
             translate([0,totalLength + stepTred + facadeThickness,0])
-            mirror([0,1,0]) corner();
+            mirror([0,1,0]) corner(withLip=withLip);
         }
     }
 }
@@ -53,10 +54,8 @@ module flatWallSection(units =2, withLip=false, withRibs=false) {
             wallProfile(withLip);
         }
 
-
-
     if (withLip != true &&  withRibs) {
-        
+
         numberOfRibs = units;
 
         for(i = [1 : numberOfRibs]) {
