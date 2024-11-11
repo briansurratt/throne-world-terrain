@@ -26,9 +26,31 @@ $fn = $preview ? 32 : 128;
 // front face arc
 // insideRoundCorner(radius=2*inchRatio, withLip = true);
 
-
 // rear face arc
-insideRoundCorner(radius=inchRatio, withLip = true);
+// insideRoundCorner(radius=inchRatio, withLip = true);
+
+
+
+// small set piece
+// left front
+// finishedWall(run=52.3,startCorner=true,endCorner= true, withLip = true, withRibs=false);
+
+// right front
+// finishedWall(run=52.3,startCorner=true,endCorner= true, withLip = true, withRibs=false);
+
+// rear
+// finishedWall(run=153,startCorner=true,endCorner= true, withLip = true, withRibs=false);
+
+
+// side faces
+// finishedWall(run=154.1,startCorner=false,endCorner= false, withLip = true, withRibs=false);
+
+
+
+
+
+
+
 
 
 // experiment calls
